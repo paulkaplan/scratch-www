@@ -4,6 +4,7 @@ const bindAll = require('lodash.bindall');
 const classNames = require('classnames');
 const keyMirror = require('keymirror');
 const FormattedMessage = require('react-intl').FormattedMessage;
+const Formsy = require('formsy-react').default;
 
 const FlexRow = require('../../../components/flex-row/flex-row.jsx');
 const Avatar = require('../../../components/avatar/avatar.jsx');
@@ -111,15 +112,18 @@ class ComposeComment extends React.Component {
                             </div>
                         </FlexRow>
                     ) : null}
-                    <InplaceInput
-                        className={classNames('compose-input',
-                            MAX_COMMENT_LENGTH - this.state.message.length >= 0 ? 'compose-valid' : 'compose-invalid')}
-                        handleUpdate={onUpdate}
-                        name="compose-comment"
-                        type="textarea"
-                        value={this.state.message}
-                        onInput={this.handleInput}
-                    />
+                    <Formsy className="full-width-form">
+                        <InplaceInput
+                            className={classNames('compose-input',
+                                MAX_COMMENT_LENGTH - this.state.message.length >= 0 ? 'compose-valid' :
+                                    'compose-invalid')}
+                            handleUpdate={onUpdate}
+                            name="compose-comment"
+                            type="textarea"
+                            value={this.state.message}
+                            onInput={this.handleInput}
+                        />
+                    </Formsy>
                     <FlexRow className="compose-bottom-row">
                         <Button
                             className="compose-post"
