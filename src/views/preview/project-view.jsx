@@ -375,6 +375,9 @@ class Preview extends React.Component {
         }
     }
     pushHistory (push) {
+        // Do not update URI with fullscreen/editor if on unsaved project
+        if (!this.state.projectId || this.state.projectId === '0') return;
+
         // update URI to match mode
         const idPath = this.state.projectId ? `${this.state.projectId}/` : '';
         let modePath = '';
