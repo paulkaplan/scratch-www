@@ -66,7 +66,8 @@ InplaceInput.propTypes = {
 
 InplaceInput.defaultProps = {
     type: 'text',
-    value: ''
+    value: '',
+    changeDebounceInterval: 1
 };
 
 module.exports = InplaceInput;
