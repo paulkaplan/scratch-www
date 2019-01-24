@@ -43,5 +43,6 @@
     "project.cloudDataAlert": "This project uses cloud data - a feature that is only available to signed in Scratchers.",
     "project.cloudVariables": "Cloud Variables",
     "project.cloudDataLink": "See Data",
-    "project.usernameBlockAlert": "This project can detect who is using it, through the \"username\" block. To hide your identity, sign out before using the project."
+    "project.usernameBlockAlert": "This project can detect who is using it, through the \"username\" block. To hide your identity, sign out before using the project.",
+    "project.badRequest": "That text is inappropriate and will not be saved"
 }

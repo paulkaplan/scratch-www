@@ -125,7 +125,10 @@ const PreviewPresentation = ({
     showModInfo,
     singleCommentId,
     userOwnsProject,
-    visibilityInfo
+    visibilityInfo,
+    titleRef,
+    notesRef,
+    instructionsRef
 }) => {
     const shareDate = ((projectInfo.history && projectInfo.history.shared)) ? projectInfo.history.shared : '';
     const revisedDate = ((projectInfo.history && projectInfo.history.modified)) ? projectInfo.history.modified : '';
@@ -233,7 +236,10 @@ const PreviewPresentation = ({
                                 </a>
                                 <div className="title">
                                     {editable ?
-                                        <Formsy onKeyPress={onKeyPress}>
+                                        <Formsy
+                                            ref={titleRef}
+                                            onKeyPress={onKeyPress}
+                                        >
                                             <InplaceInput
                                                 className="project-title"
                                                 handleUpdate={onUpdate}
@@ -379,6 +385,7 @@ const PreviewPresentation = ({
                                         {editable ?
                                             <Formsy
                                                 className="project-description-form"
+                                                ref={instructionsRef}
                                                 onKeyPress={onKeyPress}
                                             >
                                                 <InplaceInput
@@ -421,6 +428,7 @@ const PreviewPresentation = ({
                                         {editable ?
                                             <Formsy
                                                 className="project-description-form"
+                                                ref={notesRef}
                                                 onKeyPress={onKeyPress}
                                             >
                                                 <InplaceInput

@@ -6,6 +6,7 @@ const uniqBy = require('lodash.uniqby');
 
 const api = require('../lib/api');
 const log = require('../lib/log');
+const fillKeysWith = require('../lib/fill-keys-with');
 
 const COMMENT_LIMIT = 20;
 
@@ -44,7 +45,8 @@ module.exports.getInitialState = () => ({
     currentStudioIds: [],
     moreCommentsToLoad: false,
     projectNotAvailable: false,
-    visibilityInfo: {}
+    visibilityInfo: {},
+    projectUpdateError: {}
 });
 
 module.exports.previewReducer = (state, action) => {
@@ -193,6 +195,10 @@ module.exports.previewReducer = (state, action) => {
     case 'ERROR':
         log.error(action.error);
         return state;
+    case 'PROJECT_UPDATE_ERROR':
+        return Object.assign({}, state, {
+            projectUpdateError: Object.assign({}, state.projectUpdateError, action.error)
+        });
     default:
         return state;
     }
@@ -345,6 +351,11 @@ module.exports.resetComments = () => ({
 module.exports.setVisibilityInfo = visibilityInfo => ({
     type: 'SET_VISIBILITY_INFO',
     visibilityInfo: visibilityInfo
+});
+
+module.exports.setProjectUpdateError = error => ({
+    type: 'PROJECT_UPDATE_ERROR',
+    error: error
 });
 
 module.exports.getProjectInfo = (id, token) => (dispatch => {
@@ -851,6 +862,7 @@ module.exports.leaveStudio = (studioId, projectId, token) => (dispatch => {
 
 module.exports.updateProject = (id, jsonData, username, token) => (dispatch => {
     dispatch(module.exports.setFetchStatus('project', module.exports.Status.FETCHING));
+    dispatch(module.exports.setProjectUpdateError(fillKeysWith(jsonData, false)));
     api({
         uri: `/projects/${id}`,
         authentication: token,
@@ -870,6 +882,7 @@ module.exports.updateProject = (id, jsonData, username, token) => (dispatch => {
         if (res.statusCode >= 400) { // API responding with error
             dispatch(module.exports.setFetchStatus('project', module.exports.Status.ERROR));
             dispatch(module.exports.setError('API Error Response'));
+            dispatch(module.exports.setProjectUpdateError(fillKeysWith(jsonData, true)));
             return;
         }
         dispatch(module.exports.setFetchStatus('project', module.exports.Status.FETCHED));

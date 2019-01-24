@@ -7,6 +7,7 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const connect = require('react-redux').connect;
 const injectIntl = require('react-intl').injectIntl;
+const intlShape = require('react-intl').intlShape;
 const parser = require('scratch-parser');
 const copy = require('clipboard-copy');
 
@@ -87,7 +88,10 @@ class Preview extends React.Component {
             'initCounts',
             'pushHistory',
             'renderLogin',
-            'setScreenFromOrientation'
+            'setScreenFromOrientation',
+            'setTitleRef',
+            'setNotesRef',
+            'setInstructionsRef'
         ]);
         const pathname = window.location.pathname.toLowerCase();
         const parts = pathname.split('/').filter(Boolean);
@@ -188,6 +192,23 @@ class Preview extends React.Component {
                 false // Do not show cloud/username alerts again
             );
         }
+
+        const badUpdateMessage = this.props.intl.formatMessage({id: 'project.badRequest'});
+        Object.keys(this.props.projectUpdateError).forEach(field => {
+            if (this.props.projectUpdateError[field]) {
+                switch (field) {
+                case 'title':
+                    this.titleRef.updateInputsWithError({title: badUpdateMessage});
+                    break;
+                case 'description':
+                    this.notesRef.updateInputsWithError({description: badUpdateMessage});
+                    break;
+                case 'instructions':
+                    this.instructionsRef.updateInputsWithError({instructions: badUpdateMessage});
+                    break;
+                }
+            }
+        });
     }
     componentWillUnmount () {
         this.removeEventListeners();
@@ -598,6 +619,15 @@ class Preview extends React.Component {
             />
         );
     }
+    setTitleRef (ref) {
+        this.titleRef = ref;
+    }
+    setInstructionsRef (ref) {
+        this.instructionsRef = ref;
+    }
+    setNotesRef (ref) {
+        this.notesRef = ref;
+    }
     render () {
         if (this.props.projectNotAvailable || this.state.invalidProject) {
             return (
@@ -641,6 +671,7 @@ class Preview extends React.Component {
                             extensions={this.state.extensions}
                             faved={this.state.clientFaved}
                             favoriteCount={this.state.favoriteCount}
+                            instructionsRef={this.setInstructionsRef}
                             isAdmin={this.props.isAdmin}
                             isFullScreen={this.props.fullScreen}
                             isLoggedIn={this.props.isLoggedIn}
@@ -655,6 +686,7 @@ class Preview extends React.Component {
                             loved={this.state.clientLoved}
                             modInfo={this.state.modInfo}
                             moreCommentsToLoad={this.props.moreCommentsToLoad}
+                            notesRef={this.setNotesRef}
                             originalInfo={this.props.original}
                             parentInfo={this.props.parent}
                             projectHost={this.props.projectHost}
@@ -669,6 +701,7 @@ class Preview extends React.Component {
                             showModInfo={this.props.isAdmin}
                             showUsernameBlockAlert={this.state.showUsernameBlockAlert}
                             singleCommentId={this.state.singleCommentId}
+                            titleRef={this.setTitleRef}
                             userOwnsProject={this.props.userOwnsProject}
                             visibilityInfo={this.props.visibilityInfo}
                             onAddComment={this.handleAddComment}
@@ -792,6 +825,7 @@ Preview.propTypes = {
     handleSeeAllComments: PropTypes.func,
     handleToggleLoginOpen: PropTypes.func,
     handleUpdateProjectThumbnail: PropTypes.func,
+    intl: intlShape,
     isAdmin: PropTypes.bool,
     isEditable: PropTypes.bool,
     isLoggedIn: PropTypes.bool,
@@ -809,6 +843,11 @@ Preview.propTypes = {
     projectInfo: projectShape,
     projectNotAvailable: PropTypes.bool,
     projectStudios: PropTypes.arrayOf(PropTypes.object),
+    projectUpdateError: PropTypes.shape({
+        instructions: PropTypes.bool,
+        title: PropTypes.bool,
+        description: PropTypes.bool
+    }),
     remixProject: PropTypes.func,
     remixes: PropTypes.arrayOf(PropTypes.object),
     replies: PropTypes.objectOf(PropTypes.array),
@@ -912,6 +951,7 @@ const mapStateToProps = state => {
         projectInfo: state.preview.projectInfo,
         projectNotAvailable: state.preview.projectNotAvailable,
         projectStudios: state.preview.projectStudios,
+        projectUpdateError: state.preview.projectUpdateError,
         remixes: state.preview.remixes,
         replies: state.preview.replies,
         sessionStatus: state.session.status, // check if used
@@ -1039,7 +1079,7 @@ const mapDispatchToProps = dispatch => ({
 module.exports.View = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Preview);
+)(injectIntl(Preview));
 
 // replace old Scratch 2.0-style hashtag URLs with updated format
 if (window.location.hash) {
